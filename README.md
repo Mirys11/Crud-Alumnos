@@ -1,4 +1,5 @@
 1. Instalación y configuración de PostgreSQL
+
 Paso 1: Actualización e instalación de PostgreSQL
 Primero, actualice el sistema y luego instale PostgreSQL y sus contribuciones adicionales con el siguiente comando:
 
