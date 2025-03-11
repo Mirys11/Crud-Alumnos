@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD de Alumnos</title>
+    <script defer src="/app.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c2c2c; /* Fondo oscuro */
+            color: #f0f0f0; /* Texto claro */
+            margin: 0;
+            padding: 20px;
+            font-size: 12px; /* Letra más pequeña */
+        }
+        h1 {
+            text-align: center; 
+            color: #74a2f8; 
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px rgba(244, 245, 247, 0.7);
+        }
+        h2 {
+            color: #e0e0e0; 
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        th, td {
+            padding: 8px; 
+            text-align: left;
+            border: 1px solid #444; 
+        }
+        th {
+            background-color: #3a3a3a; /* Fondo de encabezado más oscuro */
+            color: #ffffff; /* Texto de encabezado blanco */
+        }
+        tr:nth-child(even) {
+            background-color: #3e3e3e; /* Fondo de filas pares */
+        }
+        tr:hover {
+            background-color: #e7b1f2; 
+        }
+        /* Estilo del modal */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .modal-content {
+            background-color: #030303; /* Fondo del modal */
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px; 
+            border-radius: 8px; 
+            color: #ffffff; /* Texto del modal en blanco */
+            font-size: 14px; /* Aumentar el tamaño de la letra */
+        }
+        .close {
+            color: #aaa; 
+            float: right; 
+            font-size: 28px; 
+            font-weight: bold; 
+        }
+        .close:hover,
+        .close:focus {
+            color: white; 
+            text-decoration: none; 
+            cursor: pointer; 
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="date"] {
+            width: calc(100% - 20px);
+            padding: 5px; 
+            margin: 5px 0;
+            border: 1px solid #666; 
+            border-radius: 4px;
+            background-color: #222222; 
+            color: #fff; 
+            font-size: 14px; /* Aumentar el tamaño de la letra */
+        }
+        button {
+            background-color: #4c59af; 
+            color: white;
+            padding: 5px 10px; 
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 15px; 
+        }
+        button:hover {
+            background-color: #d34ae5; 
+        }
+        #buscar {
+            width: 200px; /* Ancho más pequeño */
+            padding: 5px; 
+            margin-bottom: 10px;
+            border: 1px solid #666; 
+            border-radius: 4px;
+            background-color: #fbf7f7; 
+            color: #1a1919; 
+            font-size: 15px; 
+            float: right;
+        }   
+    </style>
+</head>
+<body>
+    <h1>Lista de Alumnos</h1>
+    <!-- Campo de búsqueda -->
+    <input type="text" id="buscar" placeholder="Buscar por nombre o apellido" onkeyup="buscarAlumnos()">
+    <button onclick="document.getElementById('modal').style.display='block'">Agregar/Editar Alumno</button>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Fecha de Nacimiento</th>
+                <th>Sexo</th>
+                <th>Lenguaje de Programación Favorito</th>
+                <th>Promedio Final de Primaria</th>
+                <th>Promedio Final de Secundaria</th>
+                <th>Promedio Final de Preparatoria</th>
+                <th>Promedio Actual</th>
+                <th>Salario Esperado</th>
+                <th>Color Favorito</th>
+                <th>Marca de Ropa Favorita</th>
+                <th>Marca de Celular Favorita</th>
+                <th>Materia Favorita</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="alumnos-table">
+            <!-- Ejemplo de fila de alumno -->
+            <tr>
+                <td>1</td>
+                <td>Juan</td>
+                <td>Pérez</td>
+                <td>2005-05-15</td>
+                <td>Masculino</td>
+                <td>Python</td>
+                <td>9.5</td>
+                <td>8.8</td>
+                <td>9.0</td>
+                <td>9.2</td>
+                <td>3000</td>
+                <td>Azul</td>
+                <td>Nike</td>
+                <td>Apple</td>
+                <td>Matemáticas</td>
+                <td>
+                    <button onclick="editarAlumno(1, 'Juan', 'Pérez', '2005-05-15', 'Masculino', 'Python', 9.5, 8.8, 9.0, 9.2, 3000, 'Azul', 'Nike', 'Apple', 'Matemáticas')">Editar</button>
+                </td>
+            </tr>
+            <!-- Añadir más filas según sea necesario -->
+        </tbody>
+    </table>
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('modal').style.display='none'">&times;</span>
+            <h2>Agregar/Modificar Alumno</h2>
+            <form id="alumno-form">
+                <input type="hidden" id="alumno-id" value="">
+                <input type="text" id="nombre" placeholder="Nombre" required>
+                <input type="text" id="apellido" placeholder="Apellido" required>
+                <input type="date" id="fecha_nacimiento" required>
+                <input type="text" id="sexo" placeholder="Sexo" required>
+                <input type="text" id="lenguaje_programacion" placeholder="Lenguaje de Programación Favorito" required>
+                <input type="number" id="promedio_primaria" placeholder="Promedio Final de Primaria" required step="0.1">
+                <input type="number" id="promedio_secundaria" placeholder="Promedio Final de Secundaria" required step="0.1">
+                <input type="number" id="promedio_preparatoria" placeholder="Promedio Final de Preparatoria" required step="0.1">
+                <input type="number" id="promedio_actual" placeholder="Promedio Actual" required step="0.1">
+                <input type="text" id="salario_esperado" placeholder="Salario Esperado" required>
+                <input type="text" id="color_favorito" placeholder="Color Favorito" required>
+                <input type="text" id="marca_ropa" placeholder="Marca de Ropa Favorita" required>
+                <input type="text" id="marca_celular" placeholder="Marca de Celular Favorita" required>
+                <input type="text" id="materia_favorita" placeholder="Materia Favorita" required>
+                <button type="submit">Agregar/Modificar</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Cerrar el modal si se hace clic fuera de él
+        window.onclick = function(event) {
+            var modal = document.getElementById('modal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        // Función para editar un alumno
+        function editarAlumno(id, nombre, apellido, fecha_nacimiento, sexo, lenguaje_programacion, promedio_primaria, promedio_secundaria, promedio_preparatoria, promedio_actual, salario_esperado, color_favorito, marca_ropa, marca_celular, materia_favorita) {
+            document.getElementById('alumno-id').value = id;
+            document.getElementById('nombre').value = nombre;
+            document.getElementById('apellido').value = apellido;
+            document.getElementById('fecha_nacimiento').value = fecha_nacimiento;
+            document.getElementById('sexo').value = sexo;
+            document.getElementById('lenguaje_programacion').value = lenguaje_programacion;
+            document.getElementById('promedio_primaria').value = promedio_primaria;
+            document.getElementById('promedio_secundaria').value = promedio_secundaria;
+            document.getElementById('promedio_preparatoria').value = promedio_preparatoria;
+            document.getElementById('promedio_actual').value = promedio_actual;
+            document.getElementById('salario_esperado').value = salario_esperado;
+            document.getElementById('color_favorito').value = color_favorito;
+            document.getElementById('marca_ropa').value = marca_ropa;
+            document.getElementById('marca_celular').value = marca_celular;
+            document.getElementById('materia_favorita').value = materia_favorita;
+            // Mostrar el modal
+            document.getElementById('modal').style.display = 'block';
+        }
+        // Función para buscar alumnos
+        function buscarAlumnos() {
+            const input = document.getElementById('buscar');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('alumnos-table');
+            const rows = table.getElementsByTagName('tr');
+            // Iterar sobre las filas de la tabla
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+                // Verificar si el nombre o apellido coincide con el filtro
+                for (let j = 1; j < cells.length; j++) { // Comenzar en 1 para omitir la columna ID
+                    if (cells[j].innerText.toLowerCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+                // Mostrar u ocultar la fila según el resultado de la búsqueda
+                if (found) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
